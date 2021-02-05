@@ -9,7 +9,7 @@ interface Dimension {
 interface cellAttr {
   row: number;
   col: number;
-  dimension: string;
+  dimension: number;
   state: boolean;
 }
 
@@ -22,40 +22,46 @@ const Board = ({ width, height }: Dimension) => {
   const rows = Math.floor(height / dimension);
   const cols = Math.floor(width / dimension);
 
-  let tmpBoard: JSX.Element[][] = [];
+  let initBoard: JSX.Element[][] = [];
   for (let i = 0; i < rows; i++) {
-    tmpBoard.push([]);
+    initBoard.push([]);
     for (let j = 0; j < cols; j++) {
-      tmpBoard[i].push(
+      initBoard[i].push(
         createCell({
           row: i,
           col: j,
-          dimension: dimension.toString() + "px",
+          dimension: dimension,
           state: false,
         })
       );
     }
   }
 
-  const [board, setBoard] = useState(tmpBoard);
+  const [board, setBoard] = useState(initBoard);
 
   const randomBoard = () => {
     const prob: number = Math.random();
-    let tmp: JSX.Element[][] = [];
+    let newBoard: JSX.Element[][] = [...board];
+
+    let t = 0,
+      f = 0;
+
     for (let i = 0; i < rows; i++) {
-      tmp.push([]);
       for (let j = 0; j < cols; j++) {
-        tmp[i].push(
-          createCell({
-            row: i,
-            col: j,
-            dimension: dimension.toString() + "px",
-            state: Math.random() < prob ? true : false,
-          })
-        );
+        let s = Math.random() < prob ? true : false;
+        newBoard[i][j] = createCell({
+          row: i,
+          col: j,
+          dimension: dimension,
+          state: s,
+        });
+        if (s) t++;
+        else f++;
       }
     }
-    setBoard(tmp);
+
+    console.log(t, f);
+    setBoard(newBoard);
   };
 
   return (
@@ -63,10 +69,8 @@ const Board = ({ width, height }: Dimension) => {
       <div id="board">
         {board.map((row, i) => {
           return (
-            <div className="row">
-              {row.map((cell) => {
-                return cell;
-              })}
+            <div key={i} className="row">
+              {row}
             </div>
           );
         })}

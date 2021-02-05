@@ -17,7 +17,7 @@ const getWindowDimension = (): Dimension => {
 const App = () => {
   const { w, h } = getWindowDimension();
   const [width, setWidth] = useState(w);
-  const [height, setHeight] = useState(h);
+  const [height, setHeight] = useState(h * 0.7);
 
   return <Board width={width} height={height} />;
 };
