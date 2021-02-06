@@ -5,6 +5,7 @@ Conway's Game of Life built using React
 # Deployment
 
 Deployed on github pages.<br />
+https://csjianbel.github.io/Game-of-Life-React/
 
 ### Rules
 
