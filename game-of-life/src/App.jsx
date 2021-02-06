@@ -13,6 +13,7 @@ const initializeBoard = (rows, cols) => {
 const App = () => {
   const dimension = 20;
   const { rows, cols } = useWindowDimensions(dimension);
+  console.log(cols);
 
   const [simulating, setSimulating] = useState(false);
   const [board, setBoard] = useState(initializeBoard(rows, cols));
@@ -72,7 +73,17 @@ const App = () => {
   };
 
   return (
-    <>
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        flexDirection: "column",
+        padding: "50px",
+      }}
+    >
+      <h1 style={{ position: "relative", top: "-20px" }}>
+        Conway's Game of Life
+      </h1>
       <div
         className="board"
         style={{
@@ -93,29 +104,37 @@ const App = () => {
               style={{
                 width: dimension,
                 height: dimension,
-                backgroundColor: board[i][j] ? "black" : undefined,
+                backgroundColor: board[i][j] ? "black" : "white",
                 border: "solid 1px black",
               }}
             ></div>
           ))
         )}
       </div>
-      <button
-        onClick={() => {
-          setSimulating(!simulating);
-          if (!simulating) {
-            simulatingRef.current = true;
-            runSimulation();
-          }
-        }}
-      >
-        {`${simulating ? "Stop" : "Start"} Simulation`}
-      </button>
-      <button onClick={() => setBoard(initializeBoard(rows, cols))}>
-        Clear Board
-      </button>
-      <button onClick={generateRandomBoard}>Generate Random Board</button>
-    </>
+      <div className="dashboard">
+        <button
+          className="btn"
+          onClick={() => {
+            setSimulating(!simulating);
+            if (!simulating) {
+              simulatingRef.current = true;
+              runSimulation();
+            }
+          }}
+        >
+          {`${simulating ? "Stop" : "Start"} Simulation`}
+        </button>
+        <button
+          className="btn"
+          onClick={() => setBoard(initializeBoard(rows, cols))}
+        >
+          Clear Board
+        </button>
+        <button className="btn" onClick={generateRandomBoard}>
+          Generate Random Board
+        </button>
+      </div>
+    </div>
   );
 };
 
