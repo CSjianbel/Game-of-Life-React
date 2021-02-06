@@ -2,39 +2,42 @@ import React, { useState, useCallback, useRef } from "react";
 import { produce } from "immer";
 import useWindowDimensions from "./Components/windowDimensions";
 
+const initializeBoard = (rows, cols) => {
+  const initBoard = [];
+  for (let i = 0; i < rows; i++) {
+    initBoard.push(Array.from(Array(cols), () => false));
+  }
+  return initBoard;
+};
+
 const App = () => {
   const dimension = 20;
   const { rows, cols } = useWindowDimensions(dimension);
 
   const [simulating, setSimulating] = useState(false);
-  const [board, setBoard] = useState(() => {
-    const initBoard = [];
-    for (let i = 0; i < rows; i++) {
-      initBoard.push(Array.from(Array(cols), () => 0));
-    }
-    return initBoard;
-  });
+  const [board, setBoard] = useState(initializeBoard(rows, cols));
 
   const simulatingRef = useRef(simulating);
   simulatingRef.current = simulating;
 
-  const countNeighbors = (b, y, x) => {
-    let count = 0;
-    for (let i = -1; i <= 1; i++) {
-      for (let j = -1; j <= 1; j++) {
-        // skip the middle cell
-        if (!i && !j) continue;
-        // offsets
-        const oY = y + i;
-        const oX = x + j;
-        // watch for edge cases
-        if (oY >= 0 && oY < rows && oX >= 0 && oX < cols && b[oY][oX]) count++;
-      }
-    }
-    return count;
-  };
-
   const runSimulation = useCallback(() => {
+    const countNeighbors = (b, y, x) => {
+      let count = 0;
+      for (let i = -1; i <= 1; i++) {
+        for (let j = -1; j <= 1; j++) {
+          // skip the middle cell
+          if (!i && !j) continue;
+          // offsets
+          const oY = y + i;
+          const oX = x + j;
+          // watch for edge cases
+          if (oY >= 0 && oY < rows && oX >= 0 && oX < cols && b[oY][oX])
+            count++;
+        }
+      }
+      return count;
+    };
+
     if (!simulatingRef.current) return;
     setBoard((b) => {
       return produce(b, (boardCopy) => {
@@ -53,7 +56,20 @@ const App = () => {
     });
 
     setTimeout(runSimulation, 10);
-  }, []);
+  }, [cols, rows]);
+
+  const generateRandomBoard = (e, prob = Math.random()) => {
+    setBoard((b) => {
+      return produce(b, (boardCopy) => {
+        for (let i = 0; i < rows; i++) {
+          for (let j = 0; j < cols; j++) {
+            boardCopy[i][j] = Math.random() < prob ? true : false;
+          }
+        }
+        return boardCopy;
+      });
+    });
+  };
 
   return (
     <>
@@ -95,6 +111,10 @@ const App = () => {
       >
         {`${simulating ? "Stop" : "Start"} Simulation`}
       </button>
+      <button onClick={() => setBoard(initializeBoard(rows, cols))}>
+        Clear Board
+      </button>
+      <button onClick={generateRandomBoard}>Generate Random Board</button>
     </>
   );
 };
