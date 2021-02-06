@@ -17,6 +17,7 @@ const App = () => {
 
   const [simulating, setSimulating] = useState(false);
   const [board, setBoard] = useState(initializeBoard(rows, cols));
+  const [mouseDown, setMouseDown] = useState(false);
 
   const simulatingRef = useRef(simulating);
   simulatingRef.current = simulating;
@@ -59,6 +60,13 @@ const App = () => {
     setTimeout(runSimulation, 10);
   }, [cols, rows]);
 
+  const modifyBoard = (i, j) => {
+    const newBoard = produce(board, (boardCopy) => {
+      boardCopy[i][j] = !board[i][j];
+    });
+    setBoard(newBoard);
+  };
+
   const generateRandomBoard = (e, prob = Math.random()) => {
     setBoard((b) => {
       return produce(b, (boardCopy) => {
@@ -79,10 +87,13 @@ const App = () => {
         alignItems: "center",
         flexDirection: "column",
         padding: "50px",
+        paddingBottom: 0,
       }}
+      onMouseDown={() => setMouseDown(true)}
+      onMouseUp={() => setMouseDown(false)}
     >
       <h1 style={{ position: "relative", top: "-20px" }}>
-        Conway's Game of Life
+        Ojou Nii Sama - Conway's Game of Life
       </h1>
       <div
         className="board"
@@ -95,11 +106,17 @@ const App = () => {
           row.map((cell, j) => (
             <div
               key={`${i}-${j}`}
-              onClick={() => {
-                const newBoard = produce(board, (boardCopy) => {
-                  boardCopy[i][j] = !board[i][j];
-                });
-                setBoard(newBoard);
+              onClick={() => modifyBoard(i, j)}
+              onMouseOver={(e) => {
+                if (!mouseDown) return;
+                if (
+                  e.nativeEvent.offsetX >= 0 &&
+                  e.nativeEvent.offsetX < dimension &&
+                  e.nativeEvent.offsetY >= 0 &&
+                  e.nativeEvent.offsetY < dimension
+                ) {
+                  modifyBoard(i, j);
+                }
               }}
               style={{
                 width: dimension,
@@ -114,6 +131,12 @@ const App = () => {
       <div className="dashboard">
         <button
           className="btn"
+          onClick={() => setBoard(initializeBoard(rows, cols))}
+        >
+          Clear Board
+        </button>
+        <button
+          className="btn"
           onClick={() => {
             setSimulating(!simulating);
             if (!simulating) {
@@ -123,12 +146,6 @@ const App = () => {
           }}
         >
           {`${simulating ? "Stop" : "Start"} Simulation`}
-        </button>
-        <button
-          className="btn"
-          onClick={() => setBoard(initializeBoard(rows, cols))}
-        >
-          Clear Board
         </button>
         <button className="btn" onClick={generateRandomBoard}>
           Generate Random Board
