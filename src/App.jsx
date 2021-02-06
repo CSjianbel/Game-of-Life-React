@@ -13,7 +13,6 @@ const initializeBoard = (rows, cols) => {
 const App = () => {
   const dimension = 20;
   const { rows, cols } = useWindowDimensions(dimension);
-  console.log(cols);
 
   const [simulating, setSimulating] = useState(false);
   const [board, setBoard] = useState(initializeBoard(rows, cols));
